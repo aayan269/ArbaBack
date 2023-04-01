@@ -17,9 +17,11 @@ const {userName,fullName,email,password}=req.body
 //console.log(userName,email,password);
 const user=await UserModel.findOne({email});
 if(user){
-    return res.status(201).send("user already registered")
+    return res.status(201).send({message:"user already registered"})
 }
 else{
+    console.log(req.body)
+    console.log(req)
     const file=req.files.avatar
     cloudinary.uploader.upload(file.tempFilePath,async(err,result)=>{
         console.log(res,userName,fullName,email,password,avatar=result.url)
@@ -27,12 +29,12 @@ else{
     try{
         const user=new UserModel({userName,fullName,email,password:hash,avatar:result.url})
         await user.save()
-        return res.status(201).send("user created")
+        return res.status(201).send({message:"user created"})
     
     }
     catch(e){
         console.log(e.message)
-        return res.send(e.message)
+        return res.send({message:e})
     }
     })
     

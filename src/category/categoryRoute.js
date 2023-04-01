@@ -20,7 +20,7 @@ app.post("/create",async(req,res)=>{
         //console.log(name,slug,image,owner);
         const category=await CategoryModel.findOne({name});
         if(category){
-            return res.status(201).send("category already registered")
+            return res.status(201).send({message:"category already registered"})
         }
         else{
             const file=req.files.image
@@ -28,12 +28,12 @@ app.post("/create",async(req,res)=>{
                 try{
                     const categor=new CategoryModel({name,slug,image:result.url,owner:decoded.id})
                     await categor.save()
-                    return res.status(201).send("categor created")
+                    return res.status(201).send({message:"categor created"})
                 
                 }
                 catch(e){
                     console.log(e.message)
-                    return res.send(e.message)
+                    return res.send({message:e})
                 }
             })
            

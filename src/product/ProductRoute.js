@@ -21,7 +21,7 @@ app.post("/create",async(req,res)=>{
         //console.log(name,slug,image,owner);
         const prod=await ProductModel.findOne({title});
         if(prod){
-            return res.status(201).send("product already registered")
+            return res.status(201).send({message:"product already registered"})
         }
         else{
             const file=req.files.image
@@ -31,12 +31,12 @@ app.post("/create",async(req,res)=>{
                     // console.log(categor)
                     const product=new ProductModel({title,description,image:result.url,price,owner:decoded.id,category:categor._id})
                     await product.save()
-                    return res.status(201).send("product created")
+                    return res.status(201).send({message:"product created"})
                 
                 }
                 catch(e){
                     console.log(e.message)
-                    return res.send(e.message)
+                    return res.send({message:e})
                 }
 
             })
