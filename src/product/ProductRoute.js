@@ -17,7 +17,7 @@ app.post("/create",async(req,res)=>{
     console.log(token,req.body)
     if(token){
         const decoded=jwt.decode(token)
-        const {title,description,image,price,category}=req.body
+        const {title,description,price,category}=req.body
         //console.log(name,slug,image,owner);
         const prod=await ProductModel.findOne({title});
         if(prod){
