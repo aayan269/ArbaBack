@@ -19,6 +19,6 @@ app.use("/category",categoryRoute)
 app.use("/product",productRoute)
 
 app.listen(PORT,async()=>{
-    await connect()
+    await connect
     console.log("server is running")
 })
