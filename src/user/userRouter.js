@@ -3,18 +3,29 @@ const UserModel=require("./userModel")
 const app=express.Router()
 const jwt=require("jsonwebtoken")
 const argon2=require("argon2")
+const cloudinary=require("cloudinary").v2;
+
+cloudinary.config({
+    cloud_name: "dlbmt7ylp",
+    api_key: "947921918638785",
+    api_secret: "rwjmMRKeyfvBV-45VvukpKxeFDo"
+  });
+  
 
 app.post("/signup",async(req,res)=>{
-const {userName,fullName,email,password,avatar}=req.body
+const {userName,fullName,email,password}=req.body
 //console.log(userName,email,password);
 const user=await UserModel.findOne({email});
 if(user){
     return res.status(201).send("user already registered")
 }
 else{
-    const hash=await argon2.hash(password)
+    const file=req.files.avatar
+    cloudinary.uploader.upload(file.tempFilePath,async(err,result)=>{
+        console.log(res,userName,fullName,email,password,avatar=result.url)
+        const hash=await argon2.hash(password)
     try{
-        const user=new UserModel({userName,fullName,email,password:hash,avatar})
+        const user=new UserModel({userName,fullName,email,password:hash,avatar:result.url})
         await user.save()
         return res.status(201).send("user created")
     
@@ -23,6 +34,8 @@ else{
         console.log(e.message)
         return res.send(e.message)
     }
+    })
+    
 }
 
 })
@@ -60,7 +73,7 @@ app.put("/:id",async(req,res)=>{
 
         if(decoded.id==req.params.id){
            
-console.log(req.params.id,req.body.creds)
+//console.log(req.params.id,req.body.creds)
             try{
                 const updateUser=await UserModel.findByIdAndUpdate(req.params.id,
                     {

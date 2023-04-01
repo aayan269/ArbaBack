@@ -2,6 +2,13 @@ const express=require("express")
 const CategoryModel=require("./categoryModel")
 const app=express.Router()
 const jwt=require("jsonwebtoken")
+const cloudinary=require("cloudinary").v2;
+
+cloudinary.config({
+    cloud_name: "dlbmt7ylp",
+    api_key: "947921918638785",
+    api_secret: "rwjmMRKeyfvBV-45VvukpKxeFDo"
+  });
 
 app.post("/create",async(req,res)=>{
 
@@ -16,17 +23,20 @@ app.post("/create",async(req,res)=>{
             return res.status(201).send("category already registered")
         }
         else{
+            const file=req.files.image
+            cloudinary.uploader.upload(file.tempFilePath,async(err,result)=>{
+                try{
+                    const categor=new CategoryModel({name,slug,image:result.url,owner:decoded.id})
+                    await categor.save()
+                    return res.status(201).send("categor created")
+                
+                }
+                catch(e){
+                    console.log(e.message)
+                    return res.send(e.message)
+                }
+            })
            
-            try{
-                const categor=new CategoryModel({name,slug,image,owner:decoded.id})
-                await categor.save()
-                return res.status(201).send("categor created")
-            
-            }
-            catch(e){
-                console.log(e.message)
-                return res.send(e.message)
-            }
         }
     }
     else{

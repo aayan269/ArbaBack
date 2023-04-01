@@ -1,8 +1,16 @@
 const express=require("express")
 const ProductModel=require("./ProductModel")
+const CategoryModel=require("../category/categoryModel")
 const app=express.Router()
 const jwt=require("jsonwebtoken")
+const cloudinary=require("cloudinary").v2;
 
+cloudinary.config({
+    cloud_name: "dlbmt7ylp",
+    api_key: "947921918638785",
+    api_secret: "rwjmMRKeyfvBV-45VvukpKxeFDo"
+  });
+  
 app.post("/create",async(req,res)=>{
 
     const token=req.headers["authorization"]
@@ -16,17 +24,23 @@ app.post("/create",async(req,res)=>{
             return res.status(201).send("product already registered")
         }
         else{
+            const file=req.files.image
+            cloudinary.uploader.upload(file.tempFilePath,async(err,result)=>{
+                try{
+                    const categor=await CategoryModel.findOne({name:category})
+                    // console.log(categor)
+                    const product=new ProductModel({title,description,image:result.url,price,owner:decoded.id,category:categor._id})
+                    await product.save()
+                    return res.status(201).send("product created")
+                
+                }
+                catch(e){
+                    console.log(e.message)
+                    return res.send(e.message)
+                }
+
+            })
            
-            try{
-                const product=new ProductModel({title,description,image,price,owner:decoded.id,category})
-                await product.save()
-                return res.status(201).send("product created")
-            
-            }
-            catch(e){
-                console.log(e.message)
-                return res.send(e.message)
-            }
         }
     }
     else{

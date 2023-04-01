@@ -6,13 +6,13 @@ const userRoute=require("./src/user/userRouter")
 const categoryRoute=require("./src/category/categoryRoute")
 const productRoute=require("./src/product/ProductRoute")
 const cors=require("cors")
-
+const fileupload=require("express-fileupload")
 
 const app=express()
 app.use(express.urlencoded({extended:true}))
 app.use(express.json()) 
 app.use(cors())
-
+app.use(fileupload({useTempFiles:true}))
 
 app.use("/user",userRoute)
 app.use("/category",categoryRoute)
